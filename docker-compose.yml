@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  # MongoDB service
+  mongo_db: #server's name, can be any
+    container_name: db_container # if don't provide the name, it will be created automatically
+    image: mongo:latest # specify which image we want to use (it will be retrieved from dockerhub)
+    restart: always
+    ports: 
+      - 2717:27017
+    volumes: # to get persist datas when stopping the container and return to it
+      - mongo_db:/data/db # mongo_db is the volume which is created later
+
+  # Node API service
+  api:
+    container_name: node_api
+    build: . # . means look for the Dockerfile in the same folder with this docker-compose.yml. And we use build because we want to build from our own image, not the one online.
+    ports:
+      - 4000:3000 # local machine's port : docker's port
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://db_container:27017
+      DB_NAME: camagru_db
+      NAME: blabla
+    # env_file:
+    #   - .env
+    depends_on:
+      - mongo_db
+volumes:
+  mongo_db: {}
