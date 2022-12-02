@@ -2,29 +2,40 @@ version: '3.9'
 
 services:
   # MongoDB service
-  mongo_db: #server's name, can be any
-    container_name: db_container # if don't provide the name, it will be created automatically
+  mongo_db: #service's name, can be any
     image: mongo:latest # specify which image we want to use (it will be retrieved from dockerhub)
     restart: always
     ports: 
-      - 2717:27017
+      - 2717:27017 # host:container
     volumes: # to get persist datas when stopping the container and return to it
-      - mongo_db:/data/db # mongo_db is the volume which is created later
+      - mongo_db_volumne:/data/db # mongo_db is the volume which is created later
+  
+  # Mongo Express
+  mongo_express:
+    image: mongo-express
+    ports:
+      - 8080:8080
+    environment:
 
   # Node API service
-  api:
-    container_name: node_api
+  camagru_app:
     build: . # . means look for the Dockerfile in the same folder with this docker-compose.yml. And we use build because we want to build from our own image, not the one online.
     ports:
-      - 4000:3000 # local machine's port : docker's port
-    environment:
-      PORT: 3000
-      MONGODB_URI: mongodb://db_container:27017
-      DB_NAME: camagru_db
-      NAME: blabla
+      - 4000:3000 # local machine's port : docker's node_api port
     # env_file:
     #   - .env
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo_db:27017
+      DB_NAME: camagru_db
+      NAME: blabla
     depends_on:
       - mongo_db
+      - mongo_express
 volumes:
-  mongo_db: {}
+  mongo_db_volumne:
+    name: db_in_local_machine
+    driver: local
+    driver_opts: 
+      type: 'none'
+      device: /Users/nhungnguyen/Documents/camagru_volume
