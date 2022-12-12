@@ -15,7 +15,6 @@ services:
     image: mongo-express
     ports:
       - 8080:8080
-    environment:
 
   # Node API service
   camagru_app:

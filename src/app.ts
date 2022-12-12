@@ -1,13 +1,23 @@
-import express, { Application, NextFunction, Request, Response } from 'express';
-// import { Server } from 'http';
+import { ApolloServer } from "apollo-server-express";
+import express, { Application } from "express";
 
-const PORT = 3000;
-// const HOST = '0.0.0.0'
+import typeDefs from "./schema/schema";
+import resolvers from "./resolver/resolvers";
+
+const PORT = 8080;
+
 const app: Application = express();
 
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
-    res.send("Hello from TS app");
-})
+async function startServer() {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
+  await server.start();
+  server.applyMiddleware({ app });
+}
 
-// const server: Server = app.listen(PORT, HOST, () => console.log(`Running on http://${HOST}:${PORT}`));
-app.listen(PORT, () => console.log(`Running on port ${PORT}`));
+startServer();
+app.listen({ port: PORT }, () =>
+  console.log(`Server is ready on port ${PORT}`)
+);
