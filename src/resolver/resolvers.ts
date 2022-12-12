@@ -2,6 +2,7 @@ import { privateEncrypt } from "crypto";
 import { books, authors } from "../data/mokupData";
 
 const resolvers = {
+  // Query
   Query: {
     books: () => books,
     book: (_: any, args: { id: string }) =>
@@ -12,9 +13,9 @@ const resolvers = {
   },
 
   Book: {
-    author: (parent: { authorID: number }) => {
+    author: (parent: { authorID: string }) => {
       console.log(parent);
-      return authors.find((author) => author.id === parent.authorID);
+      return authors.find((author) => author.id.toString() === parent.authorID);
     },
   },
 
@@ -23,6 +24,16 @@ const resolvers = {
       console.log(parent);
       return books.filter((book) => book.authorID === parent.id);
     },
+  },
+
+  // Mutation
+  Mutation: {
+    createAuthor: (_: any, args: { id: string; name: string; age: number }) =>
+      args, // Tra lai toan bo nhung gi user dua vao bang params
+    createBook: (
+      parent: any,
+      args: { id: string; name: string; genre: string, authorID: number }
+    ) => args,
   },
 };
 
