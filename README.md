@@ -8,3 +8,6 @@ NodeJS, Express Framework: Server Side renderingn.
 - Front: HTML, CSS, JS.
 - Back: NodeJS, Express.
 - Typescripts.
+
+## Workflow in GraphQl:
+Schema -> Resolver
