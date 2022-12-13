@@ -1,39 +1,41 @@
-import { privateEncrypt } from "crypto";
-import { books, authors } from "../data/mokupData";
+import { mongoDataMethods } from "../data/api";
 
 const resolvers = {
   // Query
   Query: {
-    books: () => books,
-    book: (_: any, args: { id: string }) =>
-      books.find((book) => book.id.toString() === args.id),
-    authors: () => authors,
-    author: (_: any, args: { id: string }) =>
-      authors.find((author) => author.id.toString() === args.id),
+    books: async () => await mongoDataMethods.getAllBooks(null),
+    book: async (_: any, args: { id: string }) =>
+      await mongoDataMethods.getBookById(args.id),
+
+    authors: async () => await mongoDataMethods.getAllAuthors(),
+    author: async (_: any, args: { id: string }) =>
+      await mongoDataMethods.getAuthorById(args.id),
   },
 
+  
   Book: {
-    author: (parent: { authorID: string }) => {
-      console.log(parent);
-      return authors.find((author) => author.id.toString() === parent.authorID);
-    },
+    author: async (parent: { authorID: string }) =>
+    await mongoDataMethods.getAuthorById(parent.authorID),
   },
-
+  
   Author: {
-    books: (parent: any) => {
-      console.log(parent);
-      return books.filter((book) => book.authorID === parent.id);
+    books: async (parent: { id: string }) => {
+      return await mongoDataMethods.getAllBooks({authorID : parent.id});
     },
   },
 
   // Mutation
   Mutation: {
-    createAuthor: (_: any, args: { id: string; name: string; age: number }) =>
-      args, // Tra lai toan bo nhung gi user dua vao bang params
-    createBook: (
-      parent: any,
-      args: { id: string; name: string; genre: string, authorID: number }
-    ) => args,
+    createAuthor: async (
+      _: any,
+      args: { name: string; age: number },
+      context: { mongoDataMethods: any }
+    ) => await context.mongoDataMethods.createAuthor(args),
+    createBook: async (
+      _: any,
+      args: { name: string; genre: string; authorID: string },
+      context: { mongoDataMethods: any }
+    ) => await context.mongoDataMethods.createBook(args),
   },
 };
 
